@@ -1,0 +1,56 @@
+{
+  "app": "template",
+
+  "vpc_name": "{{app}}-vpc",
+  "vpc_cidr": "10.0.0.0/16",
+
+  "igw_name": "{{app}}-igw",
+
+  "subnets": {
+    "public": {
+      "subnet-public": "10.0.0.0/24"
+    },
+    "private": {
+      "subnet-private-app": "10.0.1.0/24"
+    }
+  },
+
+  "security_groups_ssh_source": "0.0.0.0/0",    // override recommended
+  "security_groups": {
+    "{{app}}-vpc-gateway": {
+      "description": "security group for gateway@{{app}}-vpc",
+      "icmp": "0.0.0.0/0",
+      "tcp": [ { "port": 22, "ip": "0.0.0.0/0"}, { "port": "0..65535", "ip": "10.0.0.0/16"} ],
+      "udp": [ { "port": "0..65535", "ip": "10.0.0.0/16"} ]
+    },
+    "{{app}}-vpc-lb": {
+      "description": "security group for load balancer@{{app}}-vpc",
+      "tcp": [ { "port": 80, "ip": "0.0.0.0/0"}, { "port": 443, "ip": "0.0.0.0/0"} ]
+    },
+    "{{app}}-vpc-private": {
+      "description": "security group for private subnets@{{app}}-vpc",
+      "icmp": "0.0.0.0/0",
+      "tcp": [ { "port": "0..65535", "ip": "10.0.0.0/16"} ],
+      "udp": [ { "port": "0..65535", "ip": "10.0.0.0/16"} ]
+    }
+  },
+
+  "key_pair_name": "{{app}}-key-pair",
+  "key_pair_local_path": "~/.ssh/aws-{{app}}-key-pair.pem",
+
+  "load_balancers": {
+    "{{app}}-lb-website": {
+      "zone_name": "{{app}}.com.",
+      "listeners": [
+        { "port": 80, "protocol": "http", "instance_port": 80, "instance_protocol": "http" }
+      ],
+      "security_groups": "{{app}}-vpc-lb",
+      "health_check": { "interval": 10, "target": "HTTP:80/ping.html", "healthy_threshold": 5, "timeout": 5, "unhealthy_threshold": 2 }
+    }
+  },
+
+  "ec2_gateway_name": "gateway",
+  "ec2_gateway_zone_name": "gateway.{{app}}.com.",
+
+  "zone_name": "{{app}}.com."
+}
