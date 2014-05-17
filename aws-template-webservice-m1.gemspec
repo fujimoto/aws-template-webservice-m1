@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Aws::Template::WebserviceM1::VERSION
   spec.authors       = ["Masaki Fujimoto"]
   spec.email         = ["masaki.fujimoto@gree.net"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = "AWS Template (Webservice M1)"
+  spec.description   = "aws-template implementation (Webservice M1)"
   spec.homepage      = ""
   spec.license       = "MIT"
 
