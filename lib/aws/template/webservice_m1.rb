@@ -1,4 +1,4 @@
-require "aws/template/webservice/m1/version"
+require "aws/template/webservice_m1/version"
 
 module Aws
   module Template

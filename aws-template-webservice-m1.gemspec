@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'aws/template/webservice/m1/version'
+require 'aws/template/webservice_m1/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "aws-template-webservice-m1"
-  spec.version       = Aws::Template::Webservice::M1::VERSION
+  spec.version       = Aws::Template::WebserviceM1::VERSION
   spec.authors       = ["Masaki Fujimoto"]
   spec.email         = ["masaki.fujimoto@gree.net"]
   spec.summary       = %q{TODO: Write a short summary. Required.}
