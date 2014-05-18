@@ -9,7 +9,7 @@ module AWS
       end
 
       protected
-      def execute(config, *args)
+      def execute_apply(config, *args)
         vpc.create(config["vpc_name"], config["vpc_cidr"])
         config["vpc_id"] = vpc.aws_instance.id
 
@@ -23,7 +23,7 @@ module AWS
         igw.create(vpc.aws_instance, config["igw_name"])
         config["igw_id"] = igw.aws_instance.id
 
-        route.create(vpc.aws_instance, igw.aws_instance, config["subnets"])
+        route.create(vpc.aws_instance, igw.aws_instance, config["subnets"], "route-main", "route-public", "0.0.0.0/0")
 
         security_group.create(vpc.aws_instance, config["security_groups"], config["security_groups_ssh_source"])
         security_group.aws_instance.each do |name, s|
@@ -50,10 +50,32 @@ module AWS
         route.associate(vpc.aws_instance, eni, "route-main", "0.0.0.0/0")
 
         r53.create(config["zone_name"])
-        r53.add_a_record(config["ec2_gateway_zone_name"], eni.elastic_ip.public_ip)
+        r53.add_a_record(config["zone_name"], config["ec2_gateway_zone_name"], eni.elastic_ip.public_ip)
         config["load_balancers"].each do |lb_name, lb_config|
-          r53.add_a_record_lb(load_balancer.aws_instance, lb_name, lb_config)
+          r53.add_a_record_lb(config["zone_name"], load_balancer.aws_instance, lb_name, lb_config)
         end
+      end
+
+      def execute_destroy(config, *args)
+        shutdown_proc = args.shift
+        options = args.shift
+
+        # ec2.destroy(shutdown_proc)
+
+        r53.delete_a_record(config["zone_name"], config["ec2_gateway_zone_name"])
+        config["load_balancers"].each do |lb_name, lb_config|
+          r53.delete_a_record_lb(config["zone_name"], lb_name, lb_config)
+        end
+        r53.destroy(config["zone_name"]) if options[:destroy_zone]
+
+        load_balancer.destroy(config["load_balancers"])
+        key_pair.destroy(config["key_pair_name"]) if options[:destroy_key_pair]
+        security_group.destroy(config["security_groups"])
+
+        route.destroy(config["vpc_name"], ["route-main", "route-public"])
+        igw.destroy(config["vpc_name"], config["igw_name"])
+        subnet.destroy(config["vpc_name"], config["subnets"])
+        vpc.destroy(config["vpc_name"])
       end
 
     end
