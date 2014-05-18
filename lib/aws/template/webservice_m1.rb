@@ -60,7 +60,7 @@ module AWS
         shutdown_proc = args.shift
         options = args.shift
 
-        # ec2.destroy(shutdown_proc)
+        ec2.destroy(shutdown_proc)
 
         r53.delete_a_record(config["zone_name"], config["ec2_gateway_zone_name"])
         config["load_balancers"].each do |lb_name, lb_config|
