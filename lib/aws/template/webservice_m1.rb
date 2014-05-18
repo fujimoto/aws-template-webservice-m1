@@ -71,12 +71,12 @@ module AWS
         load_balancer.destroy(config["load_balancers"])
         key_pair.destroy(config["key_pair_name"]) if options[:destroy_key_pair]
 
+        security_group.destroy(config["security_groups"])
+
         igw.destroy(config["vpc_name"], config["igw_name"])
         subnet.destroy(config["vpc_name"], config["subnets"])
         route.destroy(config["vpc_name"], ["route-main", "route-public"])
         vpc.destroy(config["vpc_name"])
-
-        security_group.destroy(config["security_groups"])
       end
 
     end
